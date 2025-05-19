@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédiction Budgétaire</title>
+    <style>
+        /* Réinitialisation et styles de base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Conteneur principal */
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Titre */
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* Groupes de formulaire */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Bouton */
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Résultat */
+        #result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            text-align: left;
+        }
+
+        #result h3 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #result p {
+            color: #34495e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        #result p[style*="color: red"] {
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            select, input[type="number"], button {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Prédiction des Recettes et Dépenses</h1>
+        <div class="form-group">
+            <label for="commune">Commune :</label>
+            <select id="commune" name="commune">
+                {% for commune in communes %}
+                    <option value="{{ commune }}">{{ commune }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="annee">Année :</label>
+            <input type="number" id="annee" name="annee" min="2024" max="2100" value="2024">
+        </div>
+        <button onclick="predict()">Prédire</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function predict() {
+            const commune = document.getElementById('commune').value;
+            const annee = document.getElementById('annee').value;
+            const resultDiv = document.getElementById('result');
+
+            fetch('/api/predict/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ commune, annee })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.innerHTML = `<p style="color: red;">Erreur : ${data.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h3>Résultats pour ${data.commune} en ${data.annee}</h3>
+                        <p>Recettes prévues : ${data.recettes} M€</p>
+                        <p>Dépenses prévues : ${data.depenses} M€</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<p style="color: red;">Erreur serveur : ${error}</p>`;
+            });
+        }
+
+        // Fonction pour récupérer le CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

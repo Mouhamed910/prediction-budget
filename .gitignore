@@ -1,0 +1,26 @@
+ 
+# Environnement virtuel
+venv/
+
+# Fichiers Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Base de données SQLite
+db.sqlite3
+
+# Fichiers temporaires
+*.log
+*.pot
+*.DS_Store
+
+# Fichiers de configuration sensible
+*.env
+
+# Dossiers de données volumineuses (facultatif, selon votre cas)
+data/donnees_communes.xlsx
+data/donnees_communes.csv
+ml_model/models/
+ml_model/scalers/
