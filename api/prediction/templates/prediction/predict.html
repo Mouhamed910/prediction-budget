@@ -3,9 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prédiction Budgétaire</title>
+    <title>Prédiction Budgétaire des Communes</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Réinitialisation et styles de base */
+        /* Réinitialisation et styles globaux */
         * {
             margin: 0;
             padding: 0;
@@ -13,150 +17,229 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #e6f0fa 0%, #d0e4ff 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: #1a2a44;
         }
 
         /* Conteneur principal */
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
             width: 100%;
-            text-align: center;
+            padding: 40px;
+            margin: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Animation d'apparition */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Titre */
         h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 24px;
-            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: #1a2a44;
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         /* Groupes de formulaire */
         .form-group {
-            margin-bottom: 20px;
-            text-align: left;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         label {
-            display: block;
-            margin-bottom: 8px;
-            color: #34495e;
+            display: flex;
+            align-items: center;
             font-size: 14px;
             font-weight: 500;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+
+        label i {
+            margin-right: 8px;
+            color: #3498db;
         }
 
         select, input[type="number"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #dcdcdc;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 1px solid #e0e4e8;
+            border-radius: 10px;
             font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            background: #f9fafb;
+            transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
         }
 
         select:focus, input[type="number"]:focus {
             outline: none;
             border-color: #3498db;
-            box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.2);
+            background: #ffffff;
         }
 
         /* Bouton */
         button {
             width: 100%;
-            padding: 12px;
-            background-color: #3498db;
-            color: white;
+            padding: 14px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: #ffffff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
         }
 
         button:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
+            background: linear-gradient(90deg, #2980b9, #1f6391);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
         button:active {
             transform: translateY(0);
+            box-shadow: none;
         }
 
         /* Résultat */
         #result {
-            margin-top: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            text-align: left;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        #result.show {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         #result h3 {
-            color: #2c3e50;
+            font-family: 'Poppins', sans-serif;
             font-size: 18px;
-            margin-bottom: 10px;
+            color: #1a2a44;
+            margin-bottom: 15px;
         }
 
         #result p {
-            color: #34495e;
             font-size: 16px;
-            margin-bottom: 5px;
+            color: #34495e;
+            margin-bottom: 10px;
         }
 
         #result p[style*="color: red"] {
-            background-color: #ffe6e6;
-            padding: 10px;
-            border-radius: 5px;
+            background: #fff1f1;
+            padding: 12px;
+            border-radius: 8px;
             font-weight: 500;
+            border-left: 4px solid #e74c3c;
+        }
+
+        /* Indicateur de chargement */
+        #result.loading {
+            text-align: center;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        #result.loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #3498db;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Accessibilité */
+        [aria-hidden="true"] {
+            display: none;
         }
 
         /* Responsive */
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
+                padding: 25px;
                 margin: 10px;
             }
 
             h1 {
-                font-size: 20px;
+                font-size: 24px;
             }
 
             select, input[type="number"], button {
                 font-size: 14px;
-                padding: 10px;
+                padding: 12px;
+            }
+
+            #result h3 {
+                font-size: 16px;
+            }
+
+            #result p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            h1 {
+                font-size: 20px;
+            }
+
+            .container {
+                padding: 20px;
             }
         }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Prédiction des Recettes et Dépenses</h1>
-        <div class="form-group">
-            <label for="commune">Commune :</label>
-            <select id="commune" name="commune">
-                {% for commune in communes %}
-                    <option value="{{ commune }}">{{ commune }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="annee">Année :</label>
-            <input type="number" id="annee" name="annee" min="2024" max="2100" value="2024">
-        </div>
-        <button onclick="predict()">Prédire</button>
-        <div id="result"></div>
+        <h1>Prédiction Budgétaire des Communes</h1>
+        <form id="predict-form" aria-label="Formulaire de prédiction budgétaire">
+            <div class="form-group">
+                <label for="commune"><i class="fas fa-city"></i> Commune :</label>
+                <select id="commune" name="commune" required aria-describedby="commune-help">
+                    {% for commune in communes %}
+                        <option value="{{ commune }}">{{ commune }}</option>
+                    {% endfor %}
+                </select>
+                <small id="commune-help" class="sr-only">Sélectionnez une commune pour la prédiction.</small>
+            </div>
+            <div class="form-group">
+                <label for="annee"><i class="fas fa-calendar"></i> Année :</label>
+                <input type="number" id="annee" name="annee" min="2024" max="2100" value="2024" required aria-describedby="annee-help">
+                <small id="annee-help" class="sr-only">Entrez une année entre 2024 et 2100.</small>
+            </div>
+            <button type="button" onclick="predict()">Prédire</button>
+        </form>
+        <div id="result" aria-live="polite"></div>
     </div>
 
     <script>
@@ -164,6 +247,11 @@
             const commune = document.getElementById('commune').value;
             const annee = document.getElementById('annee').value;
             const resultDiv = document.getElementById('result');
+
+            // Afficher l'état de chargement
+            resultDiv.classList.remove('show');
+            resultDiv.classList.add('loading');
+            resultDiv.innerHTML = 'Chargement...';
 
             fetch('/api/predict/', {
                 method: 'POST',
@@ -175,17 +263,21 @@
             })
             .then(response => response.json())
             .then(data => {
+                resultDiv.classList.remove('loading');
+                resultDiv.classList.add('show');
                 if (data.error) {
                     resultDiv.innerHTML = `<p style="color: red;">Erreur : ${data.error}</p>`;
                 } else {
                     resultDiv.innerHTML = `
                         <h3>Résultats pour ${data.commune} en ${data.annee}</h3>
-                        <p>Recettes prévues : ${data.recettes} M€</p>
-                        <p>Dépenses prévues : ${data.depenses} M€</p>
+                        <p><i class="fas fa-arrow-up" style="color: #2ecc71;"></i> Recettes prévues : ${data.recettes} M€</p>
+                        <p><i class="fas fa-arrow-down" style="color: #e74c3c;"></i> Dépenses prévues : ${data.depenses} M€</p>
                     `;
                 }
             })
             .catch(error => {
+                resultDiv.classList.remove('loading');
+                resultDiv.classList.add('show');
                 resultDiv.innerHTML = `<p style="color: red;">Erreur serveur : ${error}</p>`;
             });
         }
@@ -205,6 +297,12 @@
             }
             return cookieValue;
         }
+
+        // Accessibilité : Ajouter la classe 'show' après le chargement initial
+        document.addEventListener('DOMContentLoaded', () => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.classList.add('show');
+        });
     </script>
 </body>
 </html>
